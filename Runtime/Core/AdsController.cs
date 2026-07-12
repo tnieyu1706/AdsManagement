@@ -10,7 +10,7 @@ namespace AdsManagement
 
         public readonly AdsSet Ads = new AdsSet();
 
-        void Start() {
+        void Awake() {
             Debug.Log("[AdsController].LevelPlay - Start setup");
             LevelPlaySetup();
             Debug.Log("[AdsController].LevelPlay - Setup completed");
