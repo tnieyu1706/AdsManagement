@@ -7,11 +7,11 @@ namespace AdsManagement
     public class AdsInstance : IDisposable
     {
         private AdsConfiguration adsConfiguration;
-        
+
         public LevelPlayBannerAd BannerAd;
         public LevelPlayInterstitialAd InterstitialAd;
         public LevelPlayRewardedAd RewardedAd;
-        
+
         public AdsInstance(AdsConfiguration adsConfiguration) {
             this.adsConfiguration = adsConfiguration;
         }
@@ -26,7 +26,7 @@ namespace AdsManagement
             SetupAds();
             Debug.Log("[AdsController].Ads - Setup completed");
         }
-        
+
         private void LevelPlaySetup() {
             LevelPlay.ValidateIntegration();
             LevelPlay.Init(adsConfiguration.appKey);
@@ -52,7 +52,7 @@ namespace AdsManagement
                 RewardedAd.OnAdLoadFailed += OnRewardedLoadFailed;
             }
         }
-        
+
         void UnregisterEvents() {
             if (BannerAd != null) {
                 BannerAd.OnAdLoaded -= OnBannerLoaded;
@@ -69,7 +69,7 @@ namespace AdsManagement
                 RewardedAd.OnAdLoadFailed -= OnRewardedLoadFailed;
             }
         }
-        
+
         #region Ad Events
 
         private void OnBannerLoaded(LevelPlayAdInfo info) {
