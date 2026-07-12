@@ -1,0 +1,21 @@
+{
+  "name": "com.tnieyu1706.adsmanagement",
+  "version": "0.1.0",
+  "displayName": "Ads Management",
+  "description": "A package for managing and working with LevelPlay ads using async/await (Task).",
+  "unity": "2021.3",
+  "author": {
+    "name": "tnieyu1706"
+  },
+  "dependencies": {
+    "com.unity.services.levelplay": "1.0.0"
+  },
+  "keywords": [
+    "ads",
+    "levelplay",
+    "ironsource",
+    "advertisement",
+    "mediation"
+  ],
+  "license": "Unlicense"
+}
