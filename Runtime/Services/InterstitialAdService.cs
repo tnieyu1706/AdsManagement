@@ -13,7 +13,7 @@ namespace AdsManagement
 
         public override bool IsReady => Ads?.InterstitialAd != null && Ads.InterstitialAd.IsAdReady();
 
-        public InterstitialAdService(AdsSet ads, int timeout = 15000) : base(ads) {
+        public InterstitialAdService(AdsInstance ads, int timeout = 15000) : base(ads) {
             RegisterHandlers();
             this.timeout = timeout;
         }

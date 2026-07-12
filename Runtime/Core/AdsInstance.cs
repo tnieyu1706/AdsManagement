@@ -1,16 +1,22 @@
+using System;
 using Unity.Services.LevelPlay;
 using UnityEngine;
 
 namespace AdsManagement
 {
-    [DefaultExecutionOrder(-100)]
-    public class AdsController : MonoBehaviour
+    public class AdsInstance : IDisposable
     {
-        [SerializeField] private AdsConfiguration adsConfiguration;
+        private AdsConfiguration adsConfiguration;
+        
+        public LevelPlayBannerAd BannerAd;
+        public LevelPlayInterstitialAd InterstitialAd;
+        public LevelPlayRewardedAd RewardedAd;
+        
+        public AdsInstance(AdsConfiguration adsConfiguration) {
+            this.adsConfiguration = adsConfiguration;
+        }
 
-        public readonly AdsSet Ads = new AdsSet();
-
-        void Awake() {
+        public void Init() {
             Debug.Log("[AdsController].LevelPlay - Start setup");
             LevelPlaySetup();
             Debug.Log("[AdsController].LevelPlay - Setup completed");
@@ -20,11 +26,7 @@ namespace AdsManagement
             SetupAds();
             Debug.Log("[AdsController].Ads - Setup completed");
         }
-
-        private void OnDestroy() {
-            UnregisterEvents();
-        }
-
+        
         private void LevelPlaySetup() {
             LevelPlay.ValidateIntegration();
             LevelPlay.Init(adsConfiguration.appKey);
@@ -33,41 +35,41 @@ namespace AdsManagement
         private void SetupAds() {
 
             if (!string.IsNullOrEmpty(adsConfiguration.bannerUnitId)) {
-                Ads.BannerAd = new LevelPlayBannerAd(adsConfiguration.bannerUnitId);
-                Ads.BannerAd.OnAdLoaded += OnBannerLoaded;
-                Ads.BannerAd.OnAdLoadFailed += OnBannerLoadFailed;
+                BannerAd = new LevelPlayBannerAd(adsConfiguration.bannerUnitId);
+                BannerAd.OnAdLoaded += OnBannerLoaded;
+                BannerAd.OnAdLoadFailed += OnBannerLoadFailed;
             }
 
             if (!string.IsNullOrEmpty(adsConfiguration.interstitialUnitId)) {
-                Ads.InterstitialAd = new LevelPlayInterstitialAd(adsConfiguration.interstitialUnitId);
-                Ads.InterstitialAd.OnAdLoaded += OnInterstitialLoaded;
-                Ads.InterstitialAd.OnAdLoadFailed += OnInterstitialLoadFailed;
+                InterstitialAd = new LevelPlayInterstitialAd(adsConfiguration.interstitialUnitId);
+                InterstitialAd.OnAdLoaded += OnInterstitialLoaded;
+                InterstitialAd.OnAdLoadFailed += OnInterstitialLoadFailed;
             }
 
             if (!string.IsNullOrEmpty(adsConfiguration.rewardedVideoUnitId)) {
-                Ads.RewardedAd = new LevelPlayRewardedAd(adsConfiguration.rewardedVideoUnitId);
-                Ads.RewardedAd.OnAdLoaded += OnRewardedLoaded;
-                Ads.RewardedAd.OnAdLoadFailed += OnRewardedLoadFailed;
+                RewardedAd = new LevelPlayRewardedAd(adsConfiguration.rewardedVideoUnitId);
+                RewardedAd.OnAdLoaded += OnRewardedLoaded;
+                RewardedAd.OnAdLoadFailed += OnRewardedLoadFailed;
             }
         }
-
+        
         void UnregisterEvents() {
-            if (Ads.BannerAd != null) {
-                Ads.BannerAd.OnAdLoaded -= OnBannerLoaded;
-                Ads.BannerAd.OnAdLoadFailed -= OnBannerLoadFailed;
+            if (BannerAd != null) {
+                BannerAd.OnAdLoaded -= OnBannerLoaded;
+                BannerAd.OnAdLoadFailed -= OnBannerLoadFailed;
             }
 
-            if (Ads.InterstitialAd != null) {
-                Ads.InterstitialAd.OnAdLoaded -= OnInterstitialLoaded;
-                Ads.InterstitialAd.OnAdLoadFailed -= OnInterstitialLoadFailed;
+            if (InterstitialAd != null) {
+                InterstitialAd.OnAdLoaded -= OnInterstitialLoaded;
+                InterstitialAd.OnAdLoadFailed -= OnInterstitialLoadFailed;
             }
 
-            if (Ads.RewardedAd != null) {
-                Ads.RewardedAd.OnAdLoaded -= OnRewardedLoaded;
-                Ads.RewardedAd.OnAdLoadFailed -= OnRewardedLoadFailed;
+            if (RewardedAd != null) {
+                RewardedAd.OnAdLoaded -= OnRewardedLoaded;
+                RewardedAd.OnAdLoadFailed -= OnRewardedLoadFailed;
             }
         }
-
+        
         #region Ad Events
 
         private void OnBannerLoaded(LevelPlayAdInfo info) {
@@ -95,5 +97,9 @@ namespace AdsManagement
         }
 
         #endregion
+
+        public void Dispose() {
+            UnregisterEvents();
+        }
     }
 }

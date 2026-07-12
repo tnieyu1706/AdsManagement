@@ -12,7 +12,7 @@ namespace AdsManagement
         private bool isReady;
         public sealed override bool IsReady => isReady;
 
-        public BannerAdService(AdsSet ads) : base(ads) {
+        public BannerAdService(AdsInstance ads) : base(ads) {
             RegisterHandlers();
         }
 

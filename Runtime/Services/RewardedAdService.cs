@@ -16,7 +16,7 @@ namespace AdsManagement
 
         public override bool IsReady => Ads?.RewardedAd != null && Ads.RewardedAd.IsAdReady();
 
-        public RewardedAdService(AdsSet ads, int timeout = 15000) : base(ads) {
+        public RewardedAdService(AdsInstance ads, int timeout = 15000) : base(ads) {
             RegisterHandlers();
             this.timeout = timeout;
         }

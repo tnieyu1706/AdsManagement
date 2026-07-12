@@ -13,10 +13,10 @@ namespace AdsManagement
 
     public abstract class BaseAdService : IAdService, IDisposable
     {
-        protected readonly AdsSet Ads;
+        protected readonly AdsInstance Ads;
         public abstract bool IsReady { get; }
 
-        protected BaseAdService(AdsSet ads) {
+        protected BaseAdService(AdsInstance ads) {
             Ads = ads;
         }
 
