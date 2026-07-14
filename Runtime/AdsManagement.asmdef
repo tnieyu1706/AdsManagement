@@ -11,6 +11,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.services.levelplay",
+            "expression": "9.0.0",
+            "define": "ADSMANAGEMENT_LEVELPLAY_SUPPORT"
+        }
+    ],
     "noEngineReferences": false
 }
