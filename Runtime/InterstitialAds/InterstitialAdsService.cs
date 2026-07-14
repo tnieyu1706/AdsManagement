@@ -11,7 +11,7 @@ namespace AdsManagement
     public class InterstitialAdsService : IDisposable
     {
         /// <summary>SDK communication adapter.</summary>
-        public readonly IInterstitialAdsAdapter Adapter;
+        private readonly IInterstitialAdsAdapter adapter;
 
         /// <summary>Maximum wait time (ms) before timeout.</summary>
         public readonly int ShowTimeout;
@@ -35,17 +35,17 @@ namespace AdsManagement
         public event Action OnAdClosed;
 
         public InterstitialAdsService(IInterstitialAdsAdapter adapter, float pacingTime, int showTimeout) {
-            this.Adapter = adapter;
+            this.adapter = adapter;
             PacingTime = pacingTime;
             ShowTimeout = showTimeout;
             RegisterHandlers();
         }
 
-        public bool IsPlacementCapped(string placement) => Adapter.IsPlacementCapped(placement);
+        public bool IsPlacementCapped(string placement) => adapter.IsPlacementCapped(placement);
 
         /// <summary>Returns the current state: AdapterNotReady / Playing / Pacing / Ready.</summary>
         public AdState GetState() {
-            if (!Adapter.IsReady)
+            if (!adapter.IsReady)
                 return AdState.AdapterNotReady;
             if (isShowing)
                 return AdState.Playing;
@@ -64,19 +64,19 @@ namespace AdsManagement
         #region Registers
 
         private void RegisterHandlers() {
-            Adapter.Loaded += HandleAdLoadComplete;
-            Adapter.LoadFailed += HandleAdLoadFailed;
-            Adapter.Displayed += HandleAdDisplayed;
-            Adapter.DisplayFailed += HandleAdDisplayFailed;
-            Adapter.Closed += HandleAdClosed;
+            adapter.Loaded += HandleAdLoadComplete;
+            adapter.LoadFailed += HandleAdLoadFailed;
+            adapter.Displayed += HandleAdDisplayed;
+            adapter.DisplayFailed += HandleAdDisplayFailed;
+            adapter.Closed += HandleAdClosed;
         }
 
         private void UnregisterHandlers() {
-            Adapter.Loaded -= HandleAdLoadComplete;
-            Adapter.LoadFailed -= HandleAdLoadFailed;
-            Adapter.Displayed -= HandleAdDisplayed;
-            Adapter.DisplayFailed -= HandleAdDisplayFailed;
-            Adapter.Closed -= HandleAdClosed;
+            adapter.Loaded -= HandleAdLoadComplete;
+            adapter.LoadFailed -= HandleAdLoadFailed;
+            adapter.Displayed -= HandleAdDisplayed;
+            adapter.DisplayFailed -= HandleAdDisplayFailed;
+            adapter.Closed -= HandleAdClosed;
         }
 
         #endregion
@@ -98,7 +98,7 @@ namespace AdsManagement
 
             loadAdTcs?.TrySetResult(false);
             loadAdTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-            Adapter.Load();
+            adapter.Load();
             var result = await loadAdTcs.Task;
             loadAdTcs = null;
             return result;
@@ -142,7 +142,7 @@ namespace AdsManagement
             showAdTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
             await using var registration = token.Register(() => showAdTcs?.TrySetCanceled(token));
-            Adapter.Show(placement);
+            adapter.Show(placement);
 
             AdResult result;
             try {

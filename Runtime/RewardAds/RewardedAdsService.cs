@@ -12,7 +12,7 @@ namespace AdsManagement
         private const int REWARD_BUFFER_MS = 300;
 
         /// <summary>SDK adapter.</summary>
-        public readonly IRewardAdsAdapter Adapter;
+        private readonly IRewardAdsAdapter adapter;
 
         /// <summary>Timeout (ms).</summary>
         public readonly int ShowTimeout;
@@ -39,17 +39,17 @@ namespace AdsManagement
         public event Action OnAdClosed;
 
         public RewardedAdsService(IRewardAdsAdapter adapter, float pacingTime, int showTimeout) {
-            this.Adapter = adapter;
+            this.adapter = adapter;
             PacingTime = pacingTime;
             ShowTimeout = showTimeout;
             RegisterHandlers();
         }
 
-        public bool IsPlacementCapped(string placement) => Adapter.IsPlacementCapped(placement);
+        public bool IsPlacementCapped(string placement) => adapter.IsPlacementCapped(placement);
 
         /// <summary>Returns the current ad state (AdapterNotReady / Playing / Pacing / Ready).</summary>
         public AdState GetState() {
-            if (!Adapter.IsReady)
+            if (!adapter.IsReady)
                 return AdState.AdapterNotReady;
             if (isShowing)
                 return AdState.Playing;
@@ -68,21 +68,21 @@ namespace AdsManagement
         #region Registers
 
         private void RegisterHandlers() {
-            Adapter.Loaded += HandleAdLoadComplete;
-            Adapter.LoadFailed += HandleAdLoadFailed;
-            Adapter.Displayed += HandleAdDisplayed;
-            Adapter.DisplayFailed += HandleAdDisplayFailed;
-            Adapter.Rewarded += HandleAdGetReward;
-            Adapter.Closed += HandleAdClosed;
+            adapter.Loaded += HandleAdLoadComplete;
+            adapter.LoadFailed += HandleAdLoadFailed;
+            adapter.Displayed += HandleAdDisplayed;
+            adapter.DisplayFailed += HandleAdDisplayFailed;
+            adapter.Rewarded += HandleAdGetReward;
+            adapter.Closed += HandleAdClosed;
         }
 
         private void UnregisterHandlers() {
-            Adapter.Loaded -= HandleAdLoadComplete;
-            Adapter.LoadFailed -= HandleAdLoadFailed;
-            Adapter.Displayed -= HandleAdDisplayed;
-            Adapter.DisplayFailed -= HandleAdDisplayFailed;
-            Adapter.Rewarded -= HandleAdGetReward;
-            Adapter.Closed -= HandleAdClosed;
+            adapter.Loaded -= HandleAdLoadComplete;
+            adapter.LoadFailed -= HandleAdLoadFailed;
+            adapter.Displayed -= HandleAdDisplayed;
+            adapter.DisplayFailed -= HandleAdDisplayFailed;
+            adapter.Rewarded -= HandleAdGetReward;
+            adapter.Closed -= HandleAdClosed;
         }
 
         #endregion
@@ -104,7 +104,7 @@ namespace AdsManagement
 
             loadAdTcs?.TrySetResult(false);
             loadAdTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-            Adapter.Load();
+            adapter.Load();
             var result = await loadAdTcs.Task;
             loadAdTcs = null;
             return result;
@@ -161,7 +161,7 @@ namespace AdsManagement
             isCollectReward = false;
 
             await using var registration = token.Register(() => showAdTcs?.TrySetCanceled(token));
-            Adapter.Show(placement);
+            adapter.Show(placement);
 
             (AdResult state, Reward? reward) result;
             try {

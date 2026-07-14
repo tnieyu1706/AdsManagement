@@ -10,7 +10,7 @@ namespace AdsManagement
     public class BannerAdsService : IDisposable
     {
         /// <summary>SDK communication adapter.</summary>
-        public readonly IBannerAdsAdapter Adapter;
+        private readonly IBannerAdsAdapter adapter;
 
         /// <summary>Minimum interval (seconds) between ad shows. 0 to disable pacing.</summary>
         public readonly float PacingTime;
@@ -27,16 +27,18 @@ namespace AdsManagement
         public event Action OnAdLoadFailed;
         public event Action OnAdDisplayed;
         public event Action OnAdDisplayFailed;
+        public event Action OnAdShown;
+        public event Action OnAdHidden;
 
         public BannerAdsService(IBannerAdsAdapter adapter, float pacingTime) {
-            this.Adapter = adapter;
+            this.adapter = adapter;
             PacingTime = pacingTime;
             RegisterHandlers();
         }
 
         /// <summary>Returns the current state: AdapterNotReady / Playing / Pacing / Ready.</summary>
         public AdState GetState() {
-            if (!Adapter.IsReady)
+            if (!adapter.IsReady)
                 return AdState.AdapterNotReady;
             if (IsShowing)
                 return AdState.Playing;
@@ -55,17 +57,17 @@ namespace AdsManagement
         #region Registers
 
         private void RegisterHandlers() {
-            Adapter.Loaded += HandleAdLoadComplete;
-            Adapter.LoadFailed += HandleAdLoadFailed;
-            Adapter.Displayed += HandleAdDisplayed;
-            Adapter.DisplayFailed += HandleAdDisplayFailed;
+            adapter.Loaded += HandleAdLoadComplete;
+            adapter.LoadFailed += HandleAdLoadFailed;
+            adapter.Displayed += HandleAdDisplayed;
+            adapter.DisplayFailed += HandleAdDisplayFailed;
         }
 
         private void UnregisterHandlers() {
-            Adapter.Loaded -= HandleAdLoadComplete;
-            Adapter.LoadFailed -= HandleAdLoadFailed;
-            Adapter.Displayed -= HandleAdDisplayed;
-            Adapter.DisplayFailed -= HandleAdDisplayFailed;
+            adapter.Loaded -= HandleAdLoadComplete;
+            adapter.LoadFailed -= HandleAdLoadFailed;
+            adapter.Displayed -= HandleAdDisplayed;
+            adapter.DisplayFailed -= HandleAdDisplayFailed;
         }
 
         #endregion
@@ -88,7 +90,7 @@ namespace AdsManagement
             
             loadAdTcs?.TrySetResult(false);
             loadAdTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-            Adapter.Load();
+            adapter.Load();
             HideAd();
             var result = await loadAdTcs.Task;
             loadAdTcs = null;
@@ -114,7 +116,8 @@ namespace AdsManagement
             if (!IsLoadCompleted) return;
             
             IsShowing = true;
-            Adapter.Show();
+            OnAdShown?.Invoke();
+            adapter.Show();
         }
 
         /// <summary>Hides the banner. Ad stays loaded and can be reshown.</summary>
@@ -122,7 +125,8 @@ namespace AdsManagement
             if (!IsLoadCompleted) return;
             
             IsShowing = false;
-            Adapter.Hide();
+            OnAdHidden?.Invoke();
+            adapter.Hide();
         }
 
         #endregion
