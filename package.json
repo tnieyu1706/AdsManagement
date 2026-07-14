@@ -1,6 +1,6 @@
 {
   "name": "com.tnieyu1706.adsmanagement",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "displayName": "Ads Management",
   "description": "A package for managing and working with LevelPlay ads using async/await (Task).",
   "unity": "2021.3",
